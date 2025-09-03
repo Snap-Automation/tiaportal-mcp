@@ -9,16 +9,9 @@ namespace TiaMcpServer.Test
     [DoNotParallelize]
     public class Test5McpServer
     {
-        private readonly bool _isInitialized = false;
-
         [TestInitialize]
         public void ClassInit()
         {
-            if (!_isInitialized)
-            {
-                Openness.Initialize();
-            }
-
             var response = McpServer.Connect();
         }
 
@@ -104,7 +97,7 @@ namespace TiaMcpServer.Test
             else
             {
                 WriteMessage($"McpServer.GetProjects()", response);
-                
+
                 if (response.Items != null)
                 {
                     response.Items.ToList().ForEach(item =>
@@ -146,16 +139,19 @@ namespace TiaMcpServer.Test
         }
 
         [TestMethod]
-        [DataRow(Settings.Project1ProjectPath, Settings.Project1PlcSoftwarePath0)]
-        [DataRow(Settings.Session1ProjectPath, Settings.Session1PlcSoftwarePath)]
-        public void Test_505_McpServer_GetSoftwareInfo(string projectPath, string softwarePath)
+        //[DataRow(Settings.Project1ProjectPath, Settings.Project1PlcSoftwarePath0)]
+        //[DataRow(Settings.Session1ProjectPath, Settings.Session1PlcSoftwarePath)]
+        [DynamicData(nameof(TiaTestCases.GetPlcSoftwareSource), typeof(TiaTestCases))]
+        public void Test_505_McpServer_GetSoftwareInfo(SimpleTiaTestCase testCase, PlcSoftwareInfo plcSoftwareInfo)
         {
+            if (testCase.Version != Engineering.TiaMajorVersion)
+                Assert.Inconclusive($"Skipping test for version {testCase.Version}.");
 
             McpServer.Connect();
-            McpServer.OpenProject(projectPath);
+            McpServer.OpenProject(testCase.ProjectPath);
 
             var success = true;
-            var response = McpServer.GetSoftwareInfo(softwarePath);
+            var response = McpServer.GetSoftwareInfo(plcSoftwareInfo.Path);
             WriteMessage("McpServer.GetSoftwareInfo()", response);
 
             McpServer.CloseProject();
@@ -164,13 +160,16 @@ namespace TiaMcpServer.Test
         }
 
         [TestMethod]
-        [DataRow(Settings.Project1ProjectPath, "HMI_0")]
-        [DataRow(Settings.Session1ProjectPath, "PC-System_1")]
-        public void Test_506_McpServer_GetDeviceInfo(string projectPath, string devicePath)
+        //[DataRow(Settings.Project1ProjectPath, "HMI_0")]
+        //[DataRow(Settings.Session1ProjectPath, "PC-System_1")]
+        [DynamicData(nameof(TiaTestCases.GetDeviceDataSource), typeof(TiaTestCases))]
+        public void Test_506_McpServer_GetDeviceInfo(SimpleTiaTestCase testCase, string devicePath)
         {
+            if (testCase.Version != Engineering.TiaMajorVersion)
+                Assert.Inconclusive($"Skipping test for version {testCase.Version}.");
 
             McpServer.Connect();
-            McpServer.OpenProject(projectPath);
+            McpServer.OpenProject(testCase.ProjectPath);
 
             var success = true;
             var response = McpServer.GetDeviceInfo(devicePath);
@@ -182,13 +181,16 @@ namespace TiaMcpServer.Test
         }
 
         [TestMethod]
-        [DataRow(Settings.Project1ProjectPath, "PC-System_0/PLC_0")]
-        [DataRow(Settings.Session1ProjectPath, "PC-System_1/Software PLC_1")]
-        public void Test_507_McpServer_GetDeviceItemInfo(string projectPath, string deviceItemPath)
+        //[DataRow(Settings.Project1ProjectPath, "PC-System_0/PLC_0")]
+        //[DataRow(Settings.Session1ProjectPath, "PC-System_1/Software PLC_1")]
+        [DynamicData(nameof(TiaTestCases.GetDeviceItemSource), typeof(TiaTestCases))]
+        public void Test_507_McpServer_GetDeviceItemInfo(SimpleTiaTestCase testCase, string deviceItemPath)
         {
+            if (testCase.Version != Engineering.TiaMajorVersion)
+                Assert.Inconclusive($"Skipping test for version {testCase.Version}.");
 
             McpServer.Connect();
-            McpServer.OpenProject(projectPath);
+            McpServer.OpenProject(testCase.ProjectPath);
 
             var success = true;
             var response = McpServer.GetDeviceItemInfo(deviceItemPath);
@@ -201,16 +203,19 @@ namespace TiaMcpServer.Test
 
 
         [TestMethod]
-        [DataRow(Settings.Project1ProjectPath, Settings.Project1PlcSoftwarePath0, "0_OBs/Main_1")]
-        [DataRow(Settings.Session1ProjectPath, Settings.Session1PlcSoftwarePath, "0_OBs/Main_1")]
-        public void Test_508_McpServer_GetBlockInfo(string projectPath, string softwarePath, string blockPath)
+        //[DataRow(Settings.Project1ProjectPath, Settings.Project1PlcSoftwarePath0, "0_OBs/Main_1")]
+        //[DataRow(Settings.Session1ProjectPath, Settings.Session1PlcSoftwarePath, "0_OBs/Main_1")]
+        [DynamicData(nameof(TiaTestCases.GetBlockDataSource), typeof(TiaTestCases))]
+        public void Test_508_McpServer_GetBlockInfo(SimpleTiaTestCase testCase, PlcSoftwareInfo plcSoftwareInfo, string blockPath)
         {
+            if (testCase.Version != Engineering.TiaMajorVersion)
+                Assert.Inconclusive($"Skipping test for version {testCase.Version}.");
 
             McpServer.Connect();
-            McpServer.OpenProject(projectPath);
+            McpServer.OpenProject(testCase.ProjectPath);
 
             var success = true;
-            var response = McpServer.GetBlockInfo(softwarePath, blockPath);
+            var response = McpServer.GetBlockInfo(plcSoftwareInfo.Path, blockPath);
             WriteMessage("McpServer.GetBlockInfo()", response);
 
             McpServer.CloseProject();
